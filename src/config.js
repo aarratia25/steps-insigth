@@ -1,18 +1,15 @@
-export default function (Vue) {
-    const Api = 'http://192.168.1.100:8000'
-
-    Vue.configs = {
-        appName: 'My App',
-        appCompany: 'Tecnibilds',
-        appLogo: '',
-        ApiUrl: Api,
+import configApi from "@/globalConfig";
+export default function(Vue) {
+  Vue.configs = {
+    appName: configApi.appName,
+    apiUrl: configApi.apiUrl,
+    apiAssetsUrl: configApi.apiAssetsUrl,
+  };
+  Object.defineProperties(Vue.prototype, {
+    $configs: {
+      get() {
+        return Vue.configs;
+      }
     }
-
-    Object.defineProperties(Vue.prototype, {
-        $configs: {
-            get() {
-                return Vue.configs
-            }
-        }
-    })
+  });
 }

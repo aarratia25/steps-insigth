@@ -29,7 +29,7 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step :complete="stepperIndex > 5" step="5">Visualización de Sugerencias</v-stepper-step>
+      <v-stepper-step :complete="stepperIndex > 5" step="5">Sugerencias</v-stepper-step>
 
     </v-stepper-header>
 
@@ -37,27 +37,32 @@
     <v-stepper-items>
       <v-stepper-content step="1">
         <v-layout justify-center>
-          <v-flex xs4 sm4 v-for="card in cards" :key="card.id">
-            <v-card max-width="344"  class="mx-auto">
-                <v-list-item>
-                    <v-list-item-title class="headline" v-text="card.title"></v-list-item-title>
-                </v-list-item>
-                <v-img :src="card.src" height="250"></v-img>
-                <v-card-text v-text="card.desc"></v-card-text>
-                <v-layout justify-center align-center>
-                    <v-card-actions justify-center>
-                        <v-form v-model="form.requirements.valid" ref="formRequirements" lazy-validation>
-                          <v-checkbox
-                            :rules="validationsRules.rulesRequirements"
-                            v-model="form.requirements.options"
-                            :label="card.title"
-                            :value="card.title">
-                          </v-checkbox>
-                        </v-form>
-                    </v-card-actions>
-                </v-layout>
-            </v-card>
-          </v-flex>
+          <v-container>
+            <v-row dense>
+              <v-flex v-for="card in cards" :key="card.id">
+                <v-card max-width="344"  class="mx-auto">
+                    <v-list-item>
+                        <v-list-item-title class="headline" v-text="card.title"></v-list-item-title>
+                    </v-list-item>
+                    <v-img :src="card.src" height="250"></v-img>
+                    <v-card-text v-text="card.desc"></v-card-text>
+                    <v-layout justify-center align-center>
+                        <v-card-actions justify-center>
+                            <v-form v-model="form.requirements.valid" ref="formRequirements" lazy-validation>
+                              <v-checkbox
+                                :rules="validationsRules.rulesRequirements"
+                                v-model="form.requirements.options"
+                                :label="card.title"
+                                :value="card.title">
+                              </v-checkbox>
+                            </v-form>
+                        </v-card-actions>
+                    </v-layout>
+                </v-card>
+              </v-flex>
+              <v-divider></v-divider>
+            </v-row>
+          </v-container>
         </v-layout>
         <br>
         <v-btn color="primary" @click="validateRequirementsForm()">
@@ -201,6 +206,7 @@
         </v-card>
       </v-stepper-content>
 
+      <!--  ********************** Technical Requirements ********************** -->
       <v-stepper-content step="4">
         <v-card class="mb-5" color="grey lighten-4 pa40">
         <v-layout justify-center>
@@ -281,92 +287,162 @@
         </v-card>
       </v-stepper-content>
 
-    <!--  ********************** General Modal ********************** -->
-    <v-row justify="center">
+      <!--  ********************** Suggestion ********************** -->
+      <v-stepper-content step="5">
+        <v-card class="mb-5" color="grey lighten-4 pa40">
+          <v-layout justify-center>
+          <v-container>
+            <v-row dense>
+              <v-flex v-for="suggestion in suggestions" :key="suggestion.id">
+                <v-card max-width="344"  class="mx-auto">
+                    <div>
+                        <iframe-view 
+                          :link="suggestion" 
+                          :center="true"
+                          :responsive="iframeData.responsive">
+                        </iframe-view>
+                    </div>
+                    <v-layout justify-center align-center>
+                        <v-card-actions justify-center>
+                          <v-btn color="success" @click="openDialogFullscreen(suggestion)">
+                            Ampliar
+                          </v-btn>
+                        </v-card-actions>
+                    </v-layout>
+                </v-card>
+              </v-flex>
+            </v-row>
+          </v-container>
+        </v-layout>
+        </v-card>
+      </v-stepper-content>
+    </v-stepper-items>
+
+    <div data="modals">
+      <!--  ********************** General Modal ********************** -->
       <v-dialog v-model="dialogGeneral" persistent max-width="290">
         <v-card>
           <v-card-title class="headline">
-             ¡Espere un momento!
+              ¡Espere un momento!
           </v-card-title>
-          <v-card-text>Estimado usuario para que nuestro algoritmo genere las referencias, de template debe responder por lo menos 5 preguntas.</v-card-text>
+          <v-card-text>Estimado usuario para que nuestro algoritmo genere las referencias, de plantillas debe responder al menos 5 preguntas.</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="green darken-1" text @click="dialogGeneral = false">Continuar</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-row>
-    <!--  ********************** Modal Colors ********************** -->
-    <v-dialog v-model="dialog" max-width="350">
-      <v-card >
-        <v-card-title class="headline">Colores</v-card-title>
-        <v-divider></v-divider>
-        <v-layout>
-          <v-flex xs12 sm12>
-            <v-container fluid>
-                <swatches-picker :value="form.technicalRequirements.colors" @input="updateValue"></swatches-picker>
+
+      <!--  ********************** Modal Colors ********************** -->
+      <v-dialog v-model="dialog" max-width="350">
+        <v-card >
+          <v-card-title class="headline">Colores</v-card-title>
+          <v-divider></v-divider>
+          <v-layout>
+            <v-flex xs12 sm12>
+              <v-container fluid>
+                  <swatches-picker :value="form.technicalRequirements.colors" @input="updateValue"></swatches-picker>
+              </v-container>
+            </v-flex>
+          </v-layout>
+        </v-card>
+      </v-dialog>
+
+      <!--  ********************** Generate Link ********************** -->
+      <v-dialog v-model="dialogRefLinkWebsite" max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Referencias de Páginas Web</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <small>Ejemplo de Link: www.conversionsinsight.com</small>
+                  <div v-for="(item, index) in form.technicalRequirements.links" :key="index"> 
+                    <v-text-field 
+                      v-model="item.link"
+                      :rules="validationsRules.technicalRequirements.emptyRulesValidWeb"
+                      :append-icon="index > 0 ? 'delete' : null"
+                      :label="'Link ' + (index + 1)"
+                      @click:append="removeFormLink(index)">
+                    </v-text-field>
+                  </div>
+                </v-col>
+              </v-row>
             </v-container>
-          </v-flex>
-        </v-layout>
-      </v-card>
-    </v-dialog>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn :disabled="buttonAddFormLink" color="blue darken-1" text @click="addFormLink()">Agregar otro Link</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
-    <!--  ********************** Generate Link ********************** -->
-    <v-dialog v-model="dialogRefLinkWebsite" max-width="600px">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Referencias de Páginas Web</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                <small>Ejemplo de Link: www.conversionsinsight.com</small>
-                <div v-for="(item, index) in form.technicalRequirements.links" :key="index"> 
-                  <v-text-field 
-                    v-model="item.link"
-                    :rules="validationsRules.technicalRequirements.emptyRulesValidWeb"
-                    :append-icon="index > 0 ? 'delete' : null"
-                    :label="'Link ' + (index + 1)"
-                    @click:append="removeFormLink(index)">
-                  </v-text-field>
-                </div>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn :disabled="buttonAddFormLink" color="blue darken-1" text @click="addFormLink()">Agregar otro Link</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    </v-stepper-items>
+      <!--  ********************** Generate Fullscreen ********************** -->
+      <v-dialog v-model="dialogFullscreen" fullscreen hide-overlay transition="dialog-bottom-transition">
+        <v-card>
+          <v-toolbar dark color="primary">
+            <v-btn icon dark @click="dialogFullscreen = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title>
+                <v-btn dark text @click="getResponsive()">
+                  {{ getResponsiveTitle }}
+                </v-btn>
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items>
+              <v-btn dark text>
+                <v-icon>shopping_cart</v-icon>
+                Adquirir ahora!
+              </v-btn>
+            </v-toolbar-items>
+          </v-toolbar>
+            <iframe-view 
+              :link="iframeData.url" 
+              :center="true"
+              :responsive="iframeData.responsive">
+            </iframe-view>
+        </v-card>
+      </v-dialog>
+    </div>
   </v-stepper>
   </v-layout>
 </template>
 
 <script>
-  import { Swatches } from 'vue-color';
+  import Swatches from 'vue-color';
+  import IframeView from '@/components/IframeView';
+  import axios from "axios";
+
   export default {
     components: {
       'swatches-picker': Swatches,
+      'iframe-view': IframeView,
     },
     data () {
       return {
+        configs: this.$configs,
+        iframeData:{
+          url: null,
+          responsive: false,
+        },
+        getResponsiveTitle: 'Responsive',
+        dialogFullscreen:false,
         dialogGeneral:false,
         dialogRefLinkWebsite: false,
         dialog: false,
         viewName: this.$route.meta.title,
-        stepperIndex: 4,
+        stepperIndex: 5,
         stepperIndex3: '¿Tiene usted empresa?',
+        suggestions: [],
         cards: [
           {
             title: 'Ecommerce',
             desc: '  Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem modi et quis porro aliquam iste fugit doloremque inventore? Adipisci maxime magnam eum doloribus tempora minima impedit. Aut quae maxime tempora?',
             src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg',
-            flex: 12
+            flex: 6
           },
           {
             title: 'Website',
@@ -607,10 +683,27 @@
         },
       }
     },
-    computed:{
-      
+    created() {
+      this.AnalyzeformTechnicalRequirements();
     },
     methods: {
+      getResponsive(){
+        
+        if (this.iframeData.responsive) {
+          this.iframeData.responsive = false;
+          this.getResponsiveTitle = 'Movil';
+        } else {
+          this.iframeData.responsive = true;
+          this.getResponsiveTitle = 'Escritorio';
+        }
+        
+      },
+      openDialogFullscreen(src){
+        
+        this.dialogFullscreen = true;
+        this.iframeData.url = src;
+        
+      },
       AnalyzeFormData(){
           let questions = this.form.technicalRequirements.questions;
           let arr = [];
@@ -623,7 +716,33 @@
           
           if ( arr.length <= 4 ) {
             this.dialogGeneral = true;
+          } else {
+
+            if (this.$refs.formTechnicalRequirements.validate()){
+                this.AnalyzeformTechnicalRequirements();
+            }
+
           }
+
+      },
+      AnalyzeformTechnicalRequirements(){
+        // this.stepperIndex = 5;
+
+        axios.get(this.configs.apiUrl)
+          .then((response) => {
+
+            let templates = response.data;
+
+              for (let i = 0; i < 3; i++) {
+
+                let item = templates.splice(Math.random() * (templates.length-1), 1).pop();
+                
+                this.suggestions.push(this.configs.apiAssetsUrl + item);
+              }
+          })
+          .catch((error) => {
+            console.log('error' , error);
+          })
       },
       addFormLink(){
         

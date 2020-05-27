@@ -7,16 +7,12 @@ Vue.config.productionTip = false
 // Global SASS Own Styles
 import '@/styles/main.scss'
 
-// Vuetify Material
+// Package Install
 import Vuetify from 'vuetify';
-
-Vue.use(Vuetify)
-
-// Axios
 import axios from 'axios'
-
 import VueAxios from 'vue-axios'
 
+Vue.use(Vuetify)
 Vue.use(VueAxios, axios);
 
 // API Config
